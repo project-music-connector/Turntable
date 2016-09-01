@@ -21,8 +21,10 @@ SoundFile c5;
 SoundFile d5;
 SoundFile e5;
 
-//define integer numberOfSensors
+//define integer number infrared sensors
 int numberOfSensors = 10;
+//define integer number of digital switches
+int numberOfSwitches = 7;
 //initialize configuration array which will contain audio sample objects
 SoundFile [] collection = new SoundFile[numberOfSensors]; 
 
@@ -80,23 +82,39 @@ void draw() {
   if (serial != null) { 
     //sensor input from Arduino, each value is separated and split depending on the ','
     //and then saved in separate cells of the array so we can access each 
-    String[] infraredSensorInput = split(serial, ','); 
+    String[] serialInput = split(serial, ','); 
     //can help to print these to console at this point to check it's working
     // println(infraredSensorInput[]); 
 
-    //convert the string inputs that are stored in the infraredSensorInput array to ints so we can use them numerically
-    int sensors [];//Array that we will store the the infrared sensor input from Arduino after we have converted it to int
-    sensors = int(infraredSensorInput);
+    //convert the string inputs that are stored in the serialInputInt array, which will then be further decomposed
+    int serialInputInt [];//Array that we will store the the infrared sensor input from Arduino after we have converted it to int
+    serialInputInt = int(serialInput);
+    
+    //create infrared sensor array
+    int[] irSensors = new int[numberOfSensors];
+    arrayCopy(serialInputInt, 0, irSensors, 0, numberOfSensors);
+    
+    //create potentiometer variable
+    //int potentiometer = serialInputInt[10];
+    
+    //create switches array
+    int[] switches = new int[numberOfSwitches];
+    arrayCopy(serialInputInt, numberOfSwitches - 1, switches, 0, numberOfSwitches);
+    
     
     //**************DETERMINE SOUNDTYPE******************************************
-    //some stuff goes here
+    for (int x = 0; x <= numberOfSwitches; x++) {
+      if (switches[x] == 1) {
+        soundType = x;
+      } //end if
+    } //end for
     
     //**************EVALUATE SENSOR DATA AND PLAY SOUNDS ACCORDINGLY**************
     for (int x = 0; x <= numberOfSensors; x++) {
       
       //determine color, update oldColor and newColor
       oldColors[x] = newColors[x];               //oldColor is now equal to the previous value of newColor
-      if (sensors[x] <= threshold) {             //if sensor value below threshold, color is white
+      if (irSensors[x] <= threshold) {           //if sensor value below threshold, color is white
         newColors[x] = 1;
       } //end(sensors[x] <= threshold)
       else {                                     //otherwise, color is black
@@ -113,7 +131,7 @@ void draw() {
         } //end if
       } //end if(soundType == 1)
   
-      if (soundType == 2) {                      //if repeated sounds
+      else if (soundType == 2) {                 //if repeated sounds
         if(newColors[x] == 1) {                  //if the color is black
           collection[x].play();                  //play the sound, allow for a momentary delay. 
           delay(delay_num);                      //As processing loops back around, the sound should repeat.
