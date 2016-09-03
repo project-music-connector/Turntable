@@ -1,6 +1,15 @@
 //Turntable
 //Alice Barbe
 //August 27th, 2016
+/*
+import processing.sound.*;
+SoundFile c4;
+void setup() {   c4 = new SoundFile(this, "C4.wav"); 
+}
+void draw() {  
+  c4.play();
+delay(2000);}
+*/
 
 import processing.sound.*;
 import processing.serial.*; //import the Serial library so can read from arudino input via serial communication
@@ -26,19 +35,18 @@ int numberOfSensors = 10;
 //define integer number of digital switches
 int numberOfSwitches = 7;
 //initialize configuration array which will contain audio sample objects
-SoundFile [] collection = new SoundFile[numberOfSensors]; 
+SoundFile[] collection = new SoundFile[numberOfSensors]; 
 
-//create collections arrays
-SoundFile [] collection1 = {c4, d4, e4, f4, g4, a4, b4, c5, d5, e5};
+
 
 //create color arrays
-int [] newColors = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-int [] oldColors = newColors;
+int[] newColors = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+int[] oldColors = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 
 //This counter will determine if you have changed sound types
 int soundType;
 //Threshold for black vs white
-int threshold = 600;
+int threshold = 800;
 //Delay for soundType 2
 int delay_num = 100;
 
@@ -56,6 +64,18 @@ void setup() {
   c5 = new SoundFile(this, "C5.wav");
   d5 = new SoundFile(this, "D5.wav");
   e5 = new SoundFile(this, "E5.wav");
+  //create collections arrays
+  collection[1] = d4;
+  collection[2] = e4;
+  collection[3] = f4;
+  collection[4] = g4;
+  collection[5] = a4;
+  collection[6] = b4;
+  collection[7] = c5;
+  collection[8] = d5;
+  collection[9] = e5;
+  collection[0] = c4;
+
 
   //serial reading code
   //when testing, this next line should be the ONLY line to cause an error: ArrayIndexOutOfBoundsExcpetion: 0
@@ -84,7 +104,10 @@ void draw() {
     //and then saved in separate cells of the array so we can access each 
     String[] serialInput = split(serial, ','); 
     //can help to print these to console at this point to check it's working
-    // println(infraredSensorInput[]); 
+    for (String s : serialInput) {
+      print(s + ", ");
+    }
+    print("\n");
 
     //convert the string inputs that are stored in the serialInputInt array, which will then be further decomposed
     int serialInputInt [];//Array that we will store the the infrared sensor input from Arduino after we have converted it to int
@@ -95,7 +118,7 @@ void draw() {
     arrayCopy(serialInputInt, 0, irSensors, 0, numberOfSensors);
     
     //create potentiometer variable
-    //int potentiometer = serialInputInt[10];
+    int potentiometer = serialInputInt[10];
     
     //create switches array
     int[] switches = new int[numberOfSwitches];
@@ -103,14 +126,16 @@ void draw() {
     
     
     //**************DETERMINE SOUNDTYPE******************************************
+    /*
     for (int x = 0; x <= numberOfSwitches; x++) {
       if (switches[x] == 1) {
         soundType = x;
       } //end if
     } //end for
+    */
     
     //**************EVALUATE SENSOR DATA AND PLAY SOUNDS ACCORDINGLY**************
-    for (int x = 0; x <= numberOfSensors; x++) {
+    for (int x = 0; x < numberOfSensors; x++) {
       
       //determine color, update oldColor and newColor
       oldColors[x] = newColors[x];               //oldColor is now equal to the previous value of newColor
@@ -123,12 +148,12 @@ void draw() {
   
       //play sounds
       if (soundType == 1) {                      //if single sounds
-        if(newColors[x] - oldColors[x] == 1) {   //if we have gone from white to black, 
+        if(newColors[x] - oldColors[x] == -1) {   //if we have gone from white to black, 
           collection[x].play();                  //play sound
         } //end if               
-        if(oldColors[x] - newColors[x] == 1) {   //if we have gone from black to white,
-          collection[x].stop();                  //stop sound (OPTIONAL)
-        } //end if
+        //if(oldColors[x] - newColors[x] == -1) {   //if we have gone from black to white,
+        //  collection[x].stop();                  //stop sound (OPTIONAL)
+        //} //end if
       } //end if(soundType == 1)
   
       else if (soundType == 2) {                 //if repeated sounds
