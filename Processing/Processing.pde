@@ -1,15 +1,6 @@
 //Turntable
-//Alice Barbe
-//August 27th, 2016
-/*
-import processing.sound.*;
-SoundFile c4;
-void setup() {   c4 = new SoundFile(this, "C4.wav"); 
-}
-void draw() {  
-  c4.play();
-delay(2000);}
-*/
+//Alice Barbe & Beatriz Fusaro
+//September, 2016
 
 import processing.sound.*;
 import processing.serial.*; //import the Serial library so can read from arudino input via serial communication
@@ -38,7 +29,6 @@ int numberOfSwitches = 7;
 SoundFile[] collection = new SoundFile[numberOfSensors]; 
 
 
-
 //create color arrays
 int[] newColors = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 int[] oldColors = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
@@ -49,6 +39,7 @@ int soundType;
 int threshold = 800;
 //Delay for soundType 2
 int delay_num = 100;
+int[] serialInputInt;
 
 
 void setup() {
@@ -64,7 +55,8 @@ void setup() {
   c5 = new SoundFile(this, "C5.wav");
   d5 = new SoundFile(this, "D5.wav");
   e5 = new SoundFile(this, "E5.wav");
-  //create collections arrays
+  
+  //create collection array
   collection[1] = d4;
   collection[2] = e4;
   collection[3] = f4;
@@ -76,7 +68,6 @@ void setup() {
   collection[9] = e5;
   collection[0] = c4;
 
-
   //serial reading code
   //when testing, this next line should be the ONLY line to cause an error: ArrayIndexOutOfBoundsExcpetion: 0
   port = new Serial(this, Serial.list()[0], 9600); // initializing the object by assigning a port and baud rate (must match that of Arduino)
@@ -84,8 +75,17 @@ void setup() {
   serial = port.readStringUntil(end); // function that reads the string from serial port until a println and then assigns string to our string variable (called 'serial')
   serial = null; // initially, the string will be null (empty)
   
-  //initialize soundType to a default value of 1
-  soundType = 1;
+  //run data in the buffer once to ensure that we splice the data properly when we begin processing the data in draw()
+  delay(50);
+  serial = port.readStringUntil(10);
+  if (serial != null) { 
+    String[] serialInput = split(serial, ','); 
+    for (String s : serialInput) {
+       print(s + ", ");
+    }
+    print("\n");
+    serialInputInt = int(serialInput);
+  }
 
 } //end setup
 
@@ -110,29 +110,16 @@ void draw() {
     print("\n");
 
     //convert the string inputs that are stored in the serialInputInt array, which will then be further decomposed
-    int serialInputInt [];//Array that we will store the the infrared sensor input from Arduino after we have converted it to int
     serialInputInt = int(serialInput);
     
     //create infrared sensor array
     int[] irSensors = new int[numberOfSensors];
     arrayCopy(serialInputInt, 0, irSensors, 0, numberOfSensors);
     
-    //create potentiometer variable
-    int potentiometer = serialInputInt[10];
-    
-    //create switches array
-    int[] switches = new int[numberOfSwitches];
-    arrayCopy(serialInputInt, numberOfSwitches - 1, switches, 0, numberOfSwitches);
-    
     
     //**************DETERMINE SOUNDTYPE******************************************
-    /*
-    for (int x = 0; x <= numberOfSwitches; x++) {
-      if (switches[x] == 1) {
-        soundType = x;
-      } //end if
-    } //end for
-    */
+    
+    soundType = int(serialInputInt[10]);
     
     //**************EVALUATE SENSOR DATA AND PLAY SOUNDS ACCORDINGLY**************
     for (int x = 0; x < numberOfSensors; x++) {
@@ -147,14 +134,13 @@ void draw() {
       } //end else
   
       //play sounds
-      if (soundType == 1) {                      //if single sounds
-        if(newColors[x] - oldColors[x] == -1) {   //if we have gone from white to black, 
-          collection[x].play();                  //play sound
-        } //end if               
-        //if(oldColors[x] - newColors[x] == -1) {   //if we have gone from black to white,
-        //  collection[x].stop();                  //stop sound (OPTIONAL)
-        //} //end if
-      } //end if(soundType == 1)
+      if (soundType == 1) {                              //if single sounds
+        if(newColors[x] - oldColors[x] == -1) {          //if we have gone from white to black, 
+          collection[x].play();                          //play sound
+        } else if(oldColors[x] - newColors[x] == -1) {   //if we have gone from black to white,
+          collection[x].stop();                          //stop sound (OPTIONAL)
+        } 
+      } 
   
       else if (soundType == 2) {                 //if repeated sounds
         if(newColors[x] == 1) {                  //if the color is black
@@ -162,6 +148,14 @@ void draw() {
           delay(delay_num);                      //As processing loops back around, the sound should repeat.
         } //end if
       } //end if(soundType == 2)
+      
+      else {
+        if(newColors[x] - oldColors[x] == -1) {          //if we have gone from white to black, 
+          collection[x].play();                          //play sound
+        } else if(oldColors[x] - newColors[x] == -1) {   //if we have gone from black to white,
+          collection[x].stop();                          //stop sound (OPTIONAL)
+        }
+      } //end else
     } //end for
   }//end if(serial != null)
 } //end draw()
