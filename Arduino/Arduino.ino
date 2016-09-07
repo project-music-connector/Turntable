@@ -4,10 +4,9 @@ Reads an analog input pin and prints the results to the serial monitor.
 created 29 Dec. 2008
 modified 9 Apr 2012
 by Tom Igoe
-modified August 31st 2016
-by Alice Barbe
+modified September 2016
+by Alice Barbe & Beatriz Fusaro
 */
-
 
 //Infrared Sensor Pins
 const int irPin0 = A0;
@@ -80,7 +79,8 @@ void loop() {
   Serial.print(",");
   Serial.print(analogIRPin9, DEC);
   Serial.print(",");
-
+  
+  // print switch results to serial
   if (digitalPin4 == 1 && digitalPin5 == 1 && digitalPin6 == 1) {
     Serial.print(1, DEC);
   } else if (digitalPin1 == 1 && digitalPin5 == 1 && digitalPin6 == 1) {
@@ -96,7 +96,7 @@ void loop() {
   } else if (digitalPin5 == 1) {
     Serial.print(6, DEC);
   }  
-  Serial.print("\n");
+  Serial.println();
 
   // wait 50 milliseconds before the next loop
   // for the analog-to-digital converter to settle
