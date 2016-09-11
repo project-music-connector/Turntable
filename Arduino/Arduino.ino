@@ -19,20 +19,43 @@ const int irPin5 = A5;
 const int irPin7 = A7;
 const int irPin8 = A8;
 const int irPin9 = A9;
+
 //Switch pins
 const int switch1 = 0;
 const int switch4 = 1;
 const int switch5 = 2;
 const int switch6 = 3;
 
+//Motor pin
+const int motorPin = 4;
+
+//Motor switch pins
+const int switchBUW = 5;
+const int switchYBU1 = 6;
+const int switchYBU2 = 7;
+const int switchRBU = 8;
+const int switchBU = 9;
+
+
 void setup() {
   // initialize serial communications at 9600 bps:
   Serial.begin(9600);
+  
   //make switch pins inputs
   pinMode(switch1, INPUT);
   pinMode(switch4, INPUT);
   pinMode(switch5, INPUT);
   pinMode(switch6, INPUT);
+  
+  //make motor pin output
+  pinMode(motorPin, OUTPUT);
+  
+  //make motor switch pins inputs
+  pinMode(switchBUW, INPUT);
+  pinMode(switchYBU1, INPUT);
+  pinMode(switchYBU2, INPUT);
+  pinMode(switchRBU, INPUT);
+  pinMode(switchBU, INPUT);
 }
 
 void loop() {
@@ -54,6 +77,13 @@ void loop() {
   int digitalPin5 = digitalRead(switch5);
   int digitalPin6 = digitalRead(switch6);
 
+  //read input pins of switch motor
+  int digitalPinBUW = digitalRead(switchBUW);
+  int digitalPinYBU1 = digitalRead(switchYBU1);
+  int digitalPinYBU2 = digitalRead(switchYBU2);
+  int digitalPinRBU = digitalRead(switchRBU);
+  int digitalPinBU = digitalRead(switchBU);
+  
   /*The Serial.print() doesn't have a space
   the ',' is used to parse the values in processing
   the last value does not require the ',' 
@@ -97,6 +127,23 @@ void loop() {
     Serial.print(6, DEC);
   }  
   Serial.println();
+
+  // evaluate motor speed switch value
+  int motorSwitchValue;
+  if (digitalPinBUW == 1 && digitalPinYBU2 == 1 && digitalPinRBU == 1) {
+    motorSwitchValue = 0;
+  } else if (digitalPinBUW == 1 && digitalPinYBU2 == 1) {
+    motorSwitchValue = 1;
+  } else if (digitalPinBUW == 1 && digitalPinYBU2 == 1 && digitalPinRBU == 1) {
+    motorSwitchValue = 2;
+  } else if (digitalPinBUW == 1 && digitalPinYBU1 == 1 && digitalPinRBU == 1) {
+    motorSwitchValue = 3;
+  } else if (digitalPinYBU1 == 1 && digitalPinRBU == 1) {
+    motorSwitchValue = 4;
+  }
+
+  // output voltage between 0 and 255 to control motor speed
+  analogWrite(motorPin, motorSwitchValue * 63);
 
   // wait 50 milliseconds before the next loop
   // for the analog-to-digital converter to settle
