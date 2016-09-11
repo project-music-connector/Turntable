@@ -29,12 +29,8 @@ const int switch6 = 3;
 //Motor pin
 const int motorPin = 4;
 
-//Motor switch pins
-const int switchBUW = 5;
-const int switchYBU1 = 6;
-const int switchYBU2 = 7;
-const int switchRBU = 8;
-const int switchBU = 9;
+//Potentiometer pin for controlling motor speed
+const int potPin = A10;
 
 
 void setup() {
@@ -50,12 +46,6 @@ void setup() {
   //make motor pin output
   pinMode(motorPin, OUTPUT);
   
-  //make motor switch pins inputs
-  pinMode(switchBUW, INPUT);
-  pinMode(switchYBU1, INPUT);
-  pinMode(switchYBU2, INPUT);
-  pinMode(switchRBU, INPUT);
-  pinMode(switchBU, INPUT);
 }
 
 void loop() {
@@ -76,13 +66,6 @@ void loop() {
   int digitalPin4 = digitalRead(switch4);
   int digitalPin5 = digitalRead(switch5);
   int digitalPin6 = digitalRead(switch6);
-
-  //read input pins of switch motor
-  int digitalPinBUW = digitalRead(switchBUW);
-  int digitalPinYBU1 = digitalRead(switchYBU1);
-  int digitalPinYBU2 = digitalRead(switchYBU2);
-  int digitalPinRBU = digitalRead(switchRBU);
-  int digitalPinBU = digitalRead(switchBU);
   
   /*The Serial.print() doesn't have a space
   the ',' is used to parse the values in processing
@@ -128,22 +111,11 @@ void loop() {
   }  
   Serial.println();
 
-  // evaluate motor speed switch value
-  int motorSwitchValue;
-  if (digitalPinBUW == 1 && digitalPinYBU2 == 1 && digitalPinRBU == 1) {
-    motorSwitchValue = 0;
-  } else if (digitalPinBUW == 1 && digitalPinYBU2 == 1) {
-    motorSwitchValue = 1;
-  } else if (digitalPinBUW == 1 && digitalPinYBU2 == 1 && digitalPinRBU == 1) {
-    motorSwitchValue = 2;
-  } else if (digitalPinBUW == 1 && digitalPinYBU1 == 1 && digitalPinRBU == 1) {
-    motorSwitchValue = 3;
-  } else if (digitalPinYBU1 == 1 && digitalPinRBU == 1) {
-    motorSwitchValue = 4;
-  }
-
+  // read potentiometer value: between 0 and 1023
+  int potValue = analogRead(potPin);
+  
   // output voltage between 0 and 255 to control motor speed
-  analogWrite(motorPin, motorSwitchValue * 63);
+  analogWrite(motorPin, potValue / 4);
 
   // wait 50 milliseconds before the next loop
   // for the analog-to-digital converter to settle
