@@ -10,16 +10,16 @@ String serial;   // declare a new string called 'serial'
 Serial port;     // The serial port, this is a new instance of the Serial class (an Object)
 
 //declare SoundFile variables that will contain the sounds
-SoundFile c4;
-SoundFile d4;
-SoundFile e4;
-SoundFile f4;
-SoundFile g4;
-SoundFile a4;
-SoundFile b4;
-SoundFile c5;
-SoundFile d5;
-SoundFile e5;
+SoundFile drum0;
+SoundFile drum1;
+SoundFile drum2;
+SoundFile drum3;
+SoundFile drum4;
+SoundFile drum5;
+SoundFile drum6;
+SoundFile drum7;
+SoundFile drum8;
+SoundFile drum9;
 
 TriOsc tric4;
 TriOsc trid4;
@@ -43,6 +43,17 @@ SinOsc weird7;
 SinOsc weird8;
 SqrOsc weird9;
 
+SoundFile piano0;
+SoundFile piano1;
+SoundFile piano2;
+SoundFile piano3;
+SoundFile piano4;
+SoundFile piano5;
+SoundFile piano6;
+SoundFile piano7;
+SoundFile piano8;
+SoundFile piano9;
+
 SinOsc rand0;
 SinOsc rand1;
 SinOsc rand2;
@@ -64,6 +75,8 @@ SoundFile[] collection1 = new SoundFile[numberOfSensors];
 //initialize soundType 2
 TriOsc[] collection2 = new TriOsc[numberOfSensors];
 float[] triOscFreq = {261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25, 586.33, 659.25};
+//initialize soundType 6
+SoundFile[] collection6 = new SoundFile[numberOfSensors];
 //initialize soundType 7
 SinOsc[] collection7 = new SinOsc[numberOfSensors];
 
@@ -84,28 +97,28 @@ int[] serialInputInt;
 void setup() {
 
   //load sound.wav files from data folder and create new objects out of them, assigning them to the initialized variables
-  c4 = new SoundFile(this, "C4.wav");
-  d4 = new SoundFile(this, "D4.wav");
-  e4 = new SoundFile(this, "E4.wav");
-  f4 = new SoundFile(this, "F4.wav");
-  g4 = new SoundFile(this, "G4.wav");
-  a4 = new SoundFile(this, "A4.wav");
-  b4 = new SoundFile(this, "B4.wav");
-  c5 = new SoundFile(this, "C5.wav");
-  d5 = new SoundFile(this, "D5.wav");
-  e5 = new SoundFile(this, "E5.wav");
-  
+  drum0 = new SoundFile(this, "crash-acoustic.wav");
+  drum1 = new SoundFile(this, "tom-acoustic01.wav");
+  drum2 = new SoundFile(this, "openhat-acoustic01.wav");
+  drum3 = new SoundFile(this, "kick-vinyl01.wav");
+  drum4 = new SoundFile(this, "clap-analog.wav");
+  drum5 = new SoundFile(this, "kick-acoustic01.wav");
+  drum6 = new SoundFile(this, "snare-acoustic02.wav");
+  drum7 = new SoundFile(this, "hihat-acoustic01.wav");
+  drum8 = new SoundFile(this, "cowbell-808.wav");
+  drum9 = new SoundFile(this, "perc-laser.wav");
+
   //create collection array
-  collection1[0] = c4;
-  collection1[1] = d4;
-  collection1[2] = e4;
-  collection1[3] = f4;
-  collection1[4] = g4;
-  collection1[5] = a4;
-  collection1[6] = b4;
-  collection1[7] = c5;
-  collection1[8] = d5;
-  collection1[9] = e5;
+  collection1[0] = drum0;
+  collection1[1] = drum1;
+  collection1[2] = drum2;
+  collection1[3] = drum3;
+  collection1[4] = drum4;
+  collection1[5] = drum5;
+  collection1[6] = drum6;
+  collection1[7] = drum7;
+  collection1[8] = drum8;
+  collection1[9] = drum0;
   
   //initialize triangle oscillation objects
   tric4 = new TriOsc(this);
@@ -154,6 +167,28 @@ void setup() {
   weird8.freq(185.00);
   weird9.freq(466.16);
   
+  piano0 = new SoundFile(this, "1g-sharp.wav");
+  piano1 = new SoundFile(this, "2a.wav");
+  piano2 = new SoundFile(this, "3b-flat.wav");
+  piano3 = new SoundFile(this, "4b.wav");
+  piano4 = new SoundFile(this, "5c.wav");
+  piano5 = new SoundFile(this, "6c-sharp.wav");
+  piano6 = new SoundFile(this, "7d.wav");
+  piano7 = new SoundFile(this, "8e-flat.wav");
+  piano8 = new SoundFile(this, "9e.wav");
+  piano9 = new SoundFile(this, "10f.wav");
+
+  collection6[0] = piano0;
+  collection6[1] = piano1;
+  collection6[2] = piano2;
+  collection6[3] = piano3;
+  collection6[4] = piano4;
+  collection6[5] = piano5;
+  collection6[6] = piano6;
+  collection6[7] = piano7;
+  collection6[8] = piano8;
+  collection6[9] = piano9;
+  
   rand0 = new SinOsc(this);
   rand1 = new SinOsc(this);
   rand2 = new SinOsc(this);
@@ -199,6 +234,8 @@ void setup() {
     print("\n");
     serialInputInt = int(serialInput);
   }
+  
+  soundType = 2;
 
 } //end setup
 
@@ -244,6 +281,8 @@ void draw() {
       else {                                     //otherwise, color is black
         newColors[x] = 0;
       } //end else
+      print(newColors[x] + ", ");
+      soundType = 3;
     } //end for
     
     //SoundType 1: Drum set
@@ -340,7 +379,13 @@ void draw() {
     } //end if
     
     if (soundType == 6) {
-      
+      for (int x = 0; x < numberOfSensors; x++) {
+        if(newColors[x] - oldColors[x] == -1) {          //if we have gone from white to black, 
+          collection6[x].play();                          //play sound
+        } else if(oldColors[x] - newColors[x] == -1) {   //if we have gone from black to white,
+          collection6[x].stop();                          //stop sound  
+        }
+      } //end for
     } //end if
     
     if (soundType == 7) {
