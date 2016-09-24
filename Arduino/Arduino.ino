@@ -27,7 +27,7 @@ const int switch5 = 2;
 const int switch6 = 3;
 
 //Motor pin
-const int motorPin = 4;
+const int motorPin = 3;
 
 //Potentiometer pin for controlling motor speed
 const int potPin = A10;
@@ -109,13 +109,16 @@ void loop() {
   } else if (digitalPin5 == 1) {
     Serial.print(6, DEC);
   }  
-  Serial.println();
 
   // read potentiometer value: between 0 and 1023
   int potValue = analogRead(potPin);
   
   // output voltage between 0 and 255 to control motor speed
   analogWrite(motorPin, potValue / 4);
+  Serial.print("    ");
+  Serial.print(potValue / 4, DEC);
+  
+  Serial.println();
 
   // wait 50 milliseconds before the next loop
   // for the analog-to-digital converter to settle
