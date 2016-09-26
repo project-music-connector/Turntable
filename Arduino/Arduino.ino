@@ -7,6 +7,7 @@ by Tom Igoe
 modified September 2016
 by Alice Barbe & Beatriz Fusaro
 */
+#include <math.h>
 
 //Infrared Sensor Pins
 const int irPin0 = A0;
@@ -32,6 +33,26 @@ const int motorPin = 3;
 //Potentiometer pin for controlling motor speed
 const int potPin = A10;
 
+int pv0[5] = {0, 0, 0, 0, 0};
+int pv1[5] = {0, 0, 0, 0, 0};
+int pv2[5] = {0, 0, 0, 0, 0};
+int pv3[5] = {0, 0, 0, 0, 0};
+int pv4[5] = {0, 0, 0, 0, 0};
+int pv5[5] = {0, 0, 0, 0, 0};
+int pv6[5] = {0, 0, 0, 0, 0};
+int pv7[5] = {0, 0, 0, 0, 0};
+int pv8[5] = {0, 0, 0, 0, 0};
+int pv9[5] = {0, 0, 0, 0, 0};
+int value = 0;
+
+int RunningAverage(int newer, int value, int pv[5]) {
+  pv[value] = newer;
+  int sum = 0;
+  for (int i = 0; i < 5; i++) {
+    sum += pv[i];
+  }
+  return sum/5;
+}
 
 void setup() {
   // initialize serial communications at 9600 bps:
@@ -60,6 +81,20 @@ void loop() {
   int analogIRPin7 = analogRead(irPin7);
   int analogIRPin8 = analogRead(irPin8);
   int analogIRPin9 = analogRead(irPin9);
+  analogIRPin0 = RunningAverage(analogIRPin0, value, pv0);
+  analogIRPin1 = RunningAverage(analogIRPin1, value, pv1);
+  analogIRPin2 = RunningAverage(analogIRPin2, value, pv2);
+  analogIRPin3 = RunningAverage(analogIRPin3, value, pv3);
+  analogIRPin4 = RunningAverage(analogIRPin4, value, pv4);
+  analogIRPin5 = RunningAverage(analogIRPin5, value, pv5);
+  analogIRPin6 = RunningAverage(analogIRPin6, value, pv6);
+  analogIRPin7 = RunningAverage(analogIRPin7, value, pv7);
+  analogIRPin8 = RunningAverage(analogIRPin8, value, pv8);
+  analogIRPin9 = RunningAverage(analogIRPin9, value, pv9);
+  value += 1;
+  if (value == 5){
+    value = 0;
+  }
 
   // read the input pin:
   int digitalPin1 = digitalRead(switch1);
