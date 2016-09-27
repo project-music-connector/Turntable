@@ -22,10 +22,12 @@ const int irPin8 = A8;
 const int irPin9 = A9;
 
 //Switch pins
-const int switch1 = 0;
-const int switch4 = 1;
-const int switch5 = 2;
-const int switch6 = 3;
+const int switch1 = 4;
+const int switch2 = 5;
+const int switch3 = 6;
+const int switch4 = 7;
+const int switch5 = 8;
+const int switch6 = 9;
 
 //Motor pin
 const int motorPin = 3;
@@ -60,10 +62,12 @@ void setup() {
   
   //make switch pins inputs
   pinMode(switch1, INPUT);
+  pinMode(switch2, INPUT);
+  pinMode(switch3, INPUT);
   pinMode(switch4, INPUT);
   pinMode(switch5, INPUT);
   pinMode(switch6, INPUT);
-  
+ 
   //make motor pin output
   pinMode(motorPin, OUTPUT);
   
@@ -98,6 +102,8 @@ void loop() {
 
   // read the input pin:
   int digitalPin1 = digitalRead(switch1);
+  int digitalPin2 = digitalRead(switch2);
+  int digitalPin3 = digitalRead(switch3);
   int digitalPin4 = digitalRead(switch4);
   int digitalPin5 = digitalRead(switch5);
   int digitalPin6 = digitalRead(switch6);
@@ -129,21 +135,24 @@ void loop() {
   Serial.print(",");
   
   // print switch results to serial
-  if (digitalPin4 == 1 && digitalPin5 == 1 && digitalPin6 == 1) {
+  if (digitalPin1 == 1) {
     Serial.print(1, DEC);
-  } else if (digitalPin1 == 1 && digitalPin5 == 1 && digitalPin6 == 1) {
-    Serial.print(7, DEC);
-  } else if (digitalPin4 == 1 && digitalPin5 == 1) {
-    Serial.print(3, DEC);
-  } else if (digitalPin1 == 1 && digitalPin5 == 1) {
-    Serial.print(5, DEC);
-  } else if (digitalPin1 == 1 && digitalPin4 == 1) {
+  }
+  else if (digitalPin2 == 1) {
     Serial.print(2, DEC);
-  } else if (digitalPin1 == 1) {
+  }
+  else if (digitalPin3 == 1) {
+    Serial.print(1, DEC);
+  }
+  else if (digitalPin4 == 1) {
     Serial.print(4, DEC);
-  } else if (digitalPin5 == 1) {
+  }
+  else if (digitalPin5 == 1) {
+    Serial.print(5, DEC);
+  }
+  else if (digitalPin6 == 1) {
     Serial.print(6, DEC);
-  }  
+  }
 
   // read potentiometer value: between 0 and 1023
   int potValue = analogRead(potPin);
