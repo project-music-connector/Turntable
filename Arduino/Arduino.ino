@@ -22,12 +22,12 @@ const int irPin8 = A8;
 const int irPin9 = A9;
 
 //Switch pins
-const int switch1 = 4;
-const int switch2 = 5;
-const int switch3 = 6;
-const int switch4 = 7;
-const int switch5 = 8;
-const int switch6 = 9;
+const int switch2 = 8;
+const int switch3 = 9;
+const int switch4 = 10;
+const int switch5 = 11;
+const int switch6 = 12;
+const int switch1 = 13;
 
 //Motor pin
 const int motorPin = 3;
@@ -67,7 +67,6 @@ void setup() {
   pinMode(switch4, INPUT);
   pinMode(switch5, INPUT);
   pinMode(switch6, INPUT);
- 
   //make motor pin output
   pinMode(motorPin, OUTPUT);
   
@@ -113,6 +112,7 @@ void loop() {
   the last value does not require the ',' 
   but make sure you have a blank Serial.println(); following it*/
   // print the results to the serial monitor:
+  
   Serial.print(analogIRPin0, DEC);
   Serial.print(",");
   Serial.print(analogIRPin1, DEC);
@@ -135,22 +135,22 @@ void loop() {
   Serial.print(",");
   
   // print switch results to serial
-  if (digitalPin1 == 1) {
+  if (digitalPin1 == HIGH) {
     Serial.print(1, DEC);
   }
-  else if (digitalPin2 == 1) {
+  else if (digitalPin2 == HIGH) {
     Serial.print(2, DEC);
   }
-  else if (digitalPin3 == 1) {
-    Serial.print(1, DEC);
+  else if (digitalPin3 == HIGH) {
+    Serial.print(3, DEC);
   }
-  else if (digitalPin4 == 1) {
+  else if (digitalPin4 == HIGH) {
     Serial.print(4, DEC);
   }
-  else if (digitalPin5 == 1) {
+  else if (digitalPin5 == HIGH) {
     Serial.print(5, DEC);
   }
-  else if (digitalPin6 == 1) {
+  else if (digitalPin6 == HIGH) {
     Serial.print(6, DEC);
   }
 
@@ -159,8 +159,8 @@ void loop() {
   
   // output voltage between 0 and 255 to control motor speed
   analogWrite(motorPin, potValue / 4);
-  Serial.print("    ");
-  Serial.print(potValue / 4, DEC);
+  //Serial.print("    ");
+  //Serial.print(potValue / 4, DEC);
   
   Serial.println();
 
