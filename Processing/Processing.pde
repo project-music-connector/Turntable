@@ -43,6 +43,17 @@ SinOsc weird7;
 SinOsc weird8;
 SqrOsc weird9;
 
+SinOsc mix0;
+SinOsc mix1;
+SinOsc mix2;
+SinOsc mix3;
+SinOsc mix4;
+SinOsc mix5;
+SoundFile mix6;
+SoundFile mix7;
+SoundFile mix8;
+SoundFile mix9;
+
 SoundFile piano0;
 SoundFile piano1;
 SoundFile piano2;
@@ -54,16 +65,16 @@ SoundFile piano7;
 SoundFile piano8;
 SoundFile piano9;
 
-SinOsc rand0;
-SinOsc rand1;
-SinOsc rand2;
-SinOsc rand3;
-SinOsc rand4;
-SinOsc rand5;
-SinOsc rand6;
-SinOsc rand7;
-SinOsc rand8;
-SinOsc rand9;
+SoundFile guitar0;
+SoundFile guitar1;
+SoundFile guitar2;
+SoundFile guitar3;
+SoundFile guitar4;
+SoundFile guitar5;
+SoundFile guitar6;
+SoundFile guitar7;
+SoundFile guitar8;
+SoundFile guitar9;
 
 //define integer number infrared sensors
 int numberOfSensors = 10;
@@ -71,14 +82,19 @@ int numberOfSensors = 10;
 int numberOfSwitches = 7;
 
 //initialize configuration array which will contain audio sample objects
+//initialize soundType 1 (drums)
 SoundFile[] collection1 = new SoundFile[numberOfSensors]; 
 //initialize soundType 2
 TriOsc[] collection2 = new TriOsc[numberOfSensors];
-float[] triOscFreq = {261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25, 586.33, 659.25};
-//initialize soundType 6
+//float[] triOscFreq = {261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25, 586.33, 659.25};
+float[] triOscFreq = {65.41, 98.00, 164.81, 261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50};
+//initialize soundType 4 (mix)
+SoundFile[] collection4 = new SoundFile[numberOfSensors];
+float[] sinOscFreq = {293.66, 329.63, 369.99, 440.00, 587.33, 880.00};
+//initialize soundType 5 (piano)
+SoundFile[] collection5 = new SoundFile[numberOfSensors];
+//initialize soundType 6 (guitar)
 SoundFile[] collection6 = new SoundFile[numberOfSensors];
-//initialize soundType 7
-SinOsc[] collection7 = new SinOsc[numberOfSensors];
 
 //create color arrays
 int[] newColors = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
@@ -87,7 +103,7 @@ int[] oldColors = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 //This counter will determine if you have changed sound types
 int soundType;
 //Threshold for black vs white
-int threshold = 800;
+int[] threshold = {600, 650, 550, 550, 600, 600, 600, 600, 650, 700};
 //Delay for soundType
 int delay_num = 100;
 //Array for holding serial input in integers
@@ -145,7 +161,7 @@ void setup() {
   collection2[9] = trie5;
   
   //initialize triangle oscillation frequencies
-  for (int x = 0; x < numberOfSensors; x++) {
+  for (int x = numberOfSensors-1; x >= 0; x--) {
     collection2[x].freq(triOscFreq[x]);
   }
   
@@ -167,6 +183,25 @@ void setup() {
   weird8.freq(185.00);
   weird9.freq(466.16);
   
+  
+  mix0 = new SinOsc(this);
+  mix1 = new SinOsc(this); 
+  mix2 = new SinOsc(this); 
+  mix3 = new SinOsc(this); 
+  mix4 = new SinOsc(this); 
+  mix5 = new SinOsc(this); 
+  mix6 = new SoundFile(this, "drum_othertom.wav");
+  mix7 = new SoundFile(this, "kick_acoustic01.wav");
+  mix8 = new SoundFile(this, "tom_acoustic01.wav");
+  mix9 = new SoundFile(this, "snare.wav");
+  
+  mix0.freq(293.66);
+  mix1.freq(329.63);
+  mix2.freq(369.99);
+  mix3.freq(440.00);
+  mix4.freq(587.33);
+  mix5.freq(880.00);
+  
   piano0 = new SoundFile(this, "1g-sharp.wav");
   piano1 = new SoundFile(this, "2a.wav");
   piano2 = new SoundFile(this, "3b-flat.wav");
@@ -178,43 +213,38 @@ void setup() {
   piano8 = new SoundFile(this, "9e.wav");
   piano9 = new SoundFile(this, "10f.wav");
 
-  collection6[0] = piano0;
-  collection6[1] = piano1;
-  collection6[2] = piano2;
-  collection6[3] = piano3;
-  collection6[4] = piano4;
-  collection6[5] = piano5;
-  collection6[6] = piano6;
-  collection6[7] = piano7;
-  collection6[8] = piano8;
-  collection6[9] = piano9;
+  collection5[0] = piano0;
+  collection5[1] = piano1;
+  collection5[2] = piano2;
+  collection5[3] = piano3;
+  collection5[4] = piano4;
+  collection5[5] = piano5;
+  collection5[6] = piano6;
+  collection5[7] = piano7;
+  collection5[8] = piano8;
+  collection5[9] = piano9;
   
-  rand0 = new SinOsc(this);
-  rand1 = new SinOsc(this);
-  rand2 = new SinOsc(this);
-  rand3 = new SinOsc(this);
-  rand4 = new SinOsc(this);
-  rand5 = new SinOsc(this);
-  rand6 = new SinOsc(this);
-  rand7 = new SinOsc(this);
-  rand8 = new SinOsc(this);
-  rand9 = new SinOsc(this);
-  
-  collection7[0] = rand0;
-  collection7[1] = rand1;
-  collection7[2] = rand2;
-  collection7[3] = rand3;
-  collection7[4] = rand4;
-  collection7[5] = rand5;
-  collection7[6] = rand6;
-  collection7[7] = rand7;
-  collection7[8] = rand8;
-  collection7[9] = rand9;
-  
-  //initialize sinusoidal oscillation frequencies with random numbers
-  for (int x = 0; x < numberOfSensors; x++) {
-    collection7[x].freq(random(220, 880));
-  }
+  guitar0 = new SoundFile(this, "6-Stg-Steel-Gtr-A4.wav");
+  guitar1 = new SoundFile(this, "6-Stg-Steel-Gtr-G4.wav");
+  guitar2 = new SoundFile(this, "6-Stg-Steel-Gtr-A3.wav");
+  guitar3 = new SoundFile(this, "6-Stg-Steel-Gtr-E3.wav");
+  guitar4 = new SoundFile(this, "6-Stg-Steel-Gtr-C3.wav");
+  guitar5 = new SoundFile(this, "6-Stg-Steel-Gtr-A2.wav");
+  guitar6 = new SoundFile(this, "6-Stg-Steel-Gtr-G2.wav");
+  guitar7 = new SoundFile(this, "6-Stg-Steel-Gtr-D2.wav");
+  guitar8 = new SoundFile(this, "6-Stg-Steel-Gtr-A1.wav");
+  guitar9 = new SoundFile(this, "6-Stg-Steel-Gtr-E1.wav");
+
+  collection6[0] = guitar0;
+  collection6[1] = guitar1;
+  collection6[2] = guitar2;
+  collection6[3] = guitar3;
+  collection6[4] = guitar4;
+  collection6[5] = guitar5;
+  collection6[6] = guitar6;
+  collection6[7] = guitar7;
+  collection6[8] = guitar8;
+  collection6[9] = guitar9;
 
   //serial reading code
   //when testing, this next line should be the ONLY line to cause an error: ArrayIndexOutOfBoundsExcpetion: 0
@@ -235,7 +265,7 @@ void setup() {
     serialInputInt = int(serialInput);
   }
   
-  soundType = 2;
+  //soundType = 2;
 
 } //end setup
 
@@ -269,20 +299,20 @@ void draw() {
     
     //**************DETERMINE AND USE SOUNDTYPE******************************************
     
-    soundType = int(serialInputInt[10]);
+    int soundType = serialInputInt[10];
     
     //**************EVALUATE SENSOR DATA AND PLAY SOUNDS ACCORDINGLY**************
     //determine color, update oldColor and newColor
     for (int x = 0; x < numberOfSensors; x++) {
       oldColors[x] = newColors[x];               //oldColor is now equal to the previous value of newColor
-      if (irSensors[x] <= threshold) {           //if sensor value below threshold, color is white
+      if (irSensors[x] <= threshold[x]) {           //if sensor value below threshold, color is white
         newColors[x] = 1;
       } //end(sensors[x] <= threshold)
       else {                                     //otherwise, color is black
         newColors[x] = 0;
       } //end else
       print(newColors[x] + ", ");
-      soundType = 3;
+      //soundType = 2;
     } //end for
     
     //SoundType 1: Drum set
@@ -371,11 +401,75 @@ void draw() {
     } //end if
     
     if (soundType == 4) {
+      if(newColors[0] - oldColors[0] == -1) {          //if we have gone from white to black, 
+        mix0.play();                                 //play sound
+      } else if(oldColors[0] - newColors[0] == -1) {   //if we have gone from black to white,
+        mix0.stop();                                 //stop sound  
+      }
       
+      if(newColors[1] - oldColors[1] == -1) {          //if we have gone from white to black, 
+        mix1.play();                                 //play sound
+      } else if(oldColors[1] - newColors[1] == -1) {   //if we have gone from black to white,
+        mix1.stop();                                 //stop sound  
+      }
+      
+      if(newColors[2] - oldColors[2] == -1) {          //if we have gone from white to black, 
+        mix2.play();                                 //play sound
+      } else if(oldColors[2] - newColors[2] == -1) {   //if we have gone from black to white,
+        mix2.stop();                                 //stop sound  
+      }
+      
+      if(newColors[3] - oldColors[3] == -1) {          //if we have gone from white to black, 
+        mix3.play();                                 //play sound
+      } else if(oldColors[3] - newColors[3] == -1) {   //if we have gone from black to white,
+        mix3.stop();                                 //stop sound  
+      }
+      
+      if(newColors[4] - oldColors[4] == -1) {          //if we have gone from white to black, 
+        mix4.play();                                 //play sound
+      } else if(oldColors[4] - newColors[4] == -1) {   //if we have gone from black to white,
+        mix4.stop();                                 //stop sound  
+      }  
+      
+      if(newColors[5] - oldColors[5] == -1) {          //if we have gone from white to black, 
+        mix5.play();                                 //play sound
+      } else if(oldColors[5] - newColors[5] == -1) {   //if we have gone from black to white,
+        mix5.stop();                                 //stop sound  
+      }
+      
+      if(newColors[6] - oldColors[6] == -1) {          //if we have gone from white to black, 
+        mix6.play();                                 //play sound
+      } else if(oldColors[6] - newColors[6] == -1) {   //if we have gone from black to white,
+        mix6.stop();                                 //stop sound  
+      }
+      
+      if(newColors[7] - oldColors[7] == -1) {          //if we have gone from white to black, 
+      //  mix7.play();                                 //play sound
+      } else if(oldColors[7] - newColors[7] == -1) {   //if we have gone from black to white,
+      //  mix7.stop();                                 //stop sound  
+      }
+      
+      if(newColors[8] - oldColors[8] == -1) {          //if we have gone from white to black, 
+        mix8.play();                                 //play sound
+      } else if(oldColors[8] - newColors[8] == -1) {   //if we have gone from black to white,
+        mix8.stop();                                 //stop sound  
+      }
+      
+      if(newColors[9] - oldColors[9] == -1) {          //if we have gone from white to black, 
+        mix9.play();                                 //play sound
+      } else if(oldColors[9] - newColors[9] == -1) {   //if we have gone from black to white,
+        mix9.stop();                                 //stop sound  
+      }
     } //end if
     
     if (soundType == 5) {
-      
+      for (int x = 0; x < numberOfSensors; x++) {
+        if(newColors[x] - oldColors[x] == -1) {          //if we have gone from white to black, 
+          collection5[x].play();                         //play sound
+        } else if(oldColors[x] - newColors[x] == -1) {   //if we have gone from black to white,
+          collection5[x].stop();                         //stop sound  
+        }
+      } //end for
     } //end if
     
     if (soundType == 6) {
@@ -384,16 +478,6 @@ void draw() {
           collection6[x].play();                          //play sound
         } else if(oldColors[x] - newColors[x] == -1) {   //if we have gone from black to white,
           collection6[x].stop();                          //stop sound  
-        }
-      } //end for
-    } //end if
-    
-    if (soundType == 7) {
-      for (int x = 0; x < numberOfSensors; x++) {
-        if(newColors[x] - oldColors[x] == -1) {          //if we have gone from white to black, 
-          collection7[x].play();                         //play sound
-        } else if(oldColors[x] - newColors[x] == -1) {   //if we have gone from black to white,
-          collection7[x].stop();                         //stop sound  
         }
       } //end for
     } //end if
