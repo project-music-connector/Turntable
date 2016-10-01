@@ -153,6 +153,7 @@ void loop() {
   else if (digitalPin6 == HIGH) {
     Serial.print(6, DEC);
   }
+  Serial.print(",");
 
   // read potentiometer value: between 0 and 1023
   int potValue = analogRead(potPin);
