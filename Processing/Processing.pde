@@ -112,7 +112,8 @@ int[] oldColors = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 int soundType;
 int oldSoundType = 0;
 //Threshold for black vs white
-int[] threshold = {600, 650, 550, 550, 600, 600, 600, 600, 650, 700};
+//int[] threshold = {600, 650, 550, 550, 600, 600, 600, 600, 650, 700};
+int[] threshold = {80, 80, 80, 80, 80, 80, 80, 80, 80, 80};
 //Array for holding serial input in integers
 int[] serialInputInt;
 
@@ -326,26 +327,27 @@ void draw() {
     
     oldSoundType = soundType;        //oldSoundType is now equal to the previous value of soundType
     soundType = serialInputInt[10];  //update soundType
+    //soundType = 2;
     
     //if we change soundType, stop all previous sounds
     if (soundType != oldSoundType) {
       for (int x = 0; x < stopTriOsc.length; x++) {
-        stopSinOsc[x].stop();
+        stopTriOsc[x].stop();
       }
       for (int x = 0; x < stopSinOsc.length; x++) {
         stopSinOsc[x].stop();
       }
       for (int x = 0; x < stopSawOsc.length; x++) {
-        stopSinOsc[x].stop();
+        stopSawOsc[x].stop();
       }
       for (int x = 0; x < stopSqrOsc.length; x++) {
-        stopSinOsc[x].stop();
+        stopSqrOsc[x].stop();
       }
       for (int x = 0; x < stopWhiteNoise.length; x++) {
-        stopSinOsc[x].stop();
+        stopWhiteNoise[x].stop();
       }
       for (int x = 0; x < stopPinkNoise.length; x++) {
-        stopSinOsc[x].stop();
+        stopPinkNoise[x].stop();
       }
     }    
     
@@ -498,7 +500,7 @@ void draw() {
       }
       
       if(newColors[8] - oldColors[8] == -1) {        //if we have gone from white to black, 
-        mix8.play();                                 //play sound
+        //mix8.play();                                 //play sound
       } else if(oldColors[8] - newColors[8] == -1) { //if we have gone from black to white,
         mix8.stop();                                 //stop sound  
       }
