@@ -96,16 +96,24 @@ SoundFile[] collection5 = new SoundFile[numberOfSensors];
 //initialize soundType 6 (guitar)
 SoundFile[] collection6 = new SoundFile[numberOfSensors];
 
+//arrays to stop generated sounds when switching modes
+SinOsc[] stopSinOsc = new SinOsc[9];
+TriOsc[] stopTriOsc = new TriOsc[10];
+SawOsc[] stopSawOsc = new SawOsc[2];
+SqrOsc[] stopSqrOsc = new SqrOsc[2];
+WhiteNoise[] stopWhiteNoise = new WhiteNoise[2];
+PinkNoise[] stopPinkNoise = new PinkNoise[1];
+
 //create color arrays
 int[] newColors = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 int[] oldColors = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 
 //This counter will determine if you have changed sound types
 int soundType;
+int oldSoundType = 0;
 //Threshold for black vs white
-int[] threshold = {600, 650, 550, 550, 600, 600, 600, 600, 650, 700};
-//Delay for soundType
-int delay_num = 100;
+//int[] threshold = {600, 650, 550, 550, 600, 600, 600, 600, 650, 700};
+int[] threshold = {80, 80, 80, 80, 80, 80, 80, 80, 80, 80};
 //Array for holding serial input in integers
 int[] serialInputInt;
 
@@ -124,7 +132,6 @@ void setup() {
   drum8 = new SoundFile(this, "cowbell-808.wav");
   drum9 = new SoundFile(this, "perc-laser.wav");
 
-  //create collection array
   collection1[0] = drum0;
   collection1[1] = drum1;
   collection1[2] = drum2;
@@ -136,7 +143,6 @@ void setup() {
   collection1[8] = drum8;
   collection1[9] = drum0;
   
-  //initialize triangle oscillation objects
   tric4 = new TriOsc(this);
   trid4 = new TriOsc(this);
   trie4 = new TriOsc(this);
@@ -148,7 +154,6 @@ void setup() {
   trid5 = new TriOsc(this);
   trie5 = new TriOsc(this);
   
-  //create triangle oscillation array
   collection2[0] = tric4;
   collection2[1] = trid4;
   collection2[2] = trie4;
@@ -160,8 +165,7 @@ void setup() {
   collection2[8] = trid5;
   collection2[9] = trie5;
   
-  //initialize triangle oscillation frequencies
-  for (int x = numberOfSensors-1; x >= 0; x--) {
+  for (int x = numberOfSensors - 1; x >= 0; x--) {
     collection2[x].freq(triOscFreq[x]);
   }
   
@@ -182,7 +186,6 @@ void setup() {
   weird7.freq(196.00);
   weird8.freq(185.00);
   weird9.freq(466.16);
-  
   
   mix0 = new SinOsc(this);
   mix1 = new SinOsc(this); 
@@ -245,6 +248,32 @@ void setup() {
   collection6[7] = guitar7;
   collection6[8] = guitar8;
   collection6[9] = guitar9;
+  
+  //Add generated sounds to stop arrays
+  for (int x = 0; x < 10; x++) {
+    stopTriOsc[x] = collection2[x];
+  }
+  
+  stopSinOsc[0] = weird6;
+  stopSinOsc[1] = weird7;
+  stopSinOsc[2] = weird8;
+  stopSinOsc[3] = mix0;
+  stopSinOsc[4] = mix1;
+  stopSinOsc[5] = mix2;
+  stopSinOsc[6] = mix3;
+  stopSinOsc[7] = mix4;
+  stopSinOsc[8] = mix5;
+  
+  stopSqrOsc[0] = weird0;
+  stopSqrOsc[1] = weird9;
+  
+  stopSawOsc[0] = weird1;
+  stopSawOsc[1] = weird2;
+  
+  stopWhiteNoise[0] = weird3;
+  stopWhiteNoise[1] = weird5;
+  
+  stopPinkNoise[0] = weird4;  
 
   //serial reading code
   //when testing, this next line should be the ONLY line to cause an error: ArrayIndexOutOfBoundsExcpetion: 0
@@ -264,9 +293,6 @@ void setup() {
     print("\n");
     serialInputInt = int(serialInput);
   }
-  
-  //soundType = 2;
-
 } //end setup
 
 
@@ -299,31 +325,55 @@ void draw() {
     
     //**************DETERMINE AND USE SOUNDTYPE******************************************
     
-    int soundType = serialInputInt[10];
+    oldSoundType = soundType;        //oldSoundType is now equal to the previous value of soundType
+    soundType = serialInputInt[10];  //update soundType
+    //soundType = 2;
+    
+    //if we change soundType, stop all previous sounds
+    if (soundType != oldSoundType) {
+      for (int x = 0; x < stopTriOsc.length; x++) {
+        stopTriOsc[x].stop();
+      }
+      for (int x = 0; x < stopSinOsc.length; x++) {
+        stopSinOsc[x].stop();
+      }
+      for (int x = 0; x < stopSawOsc.length; x++) {
+        stopSawOsc[x].stop();
+      }
+      for (int x = 0; x < stopSqrOsc.length; x++) {
+        stopSqrOsc[x].stop();
+      }
+      for (int x = 0; x < stopWhiteNoise.length; x++) {
+        stopWhiteNoise[x].stop();
+      }
+      for (int x = 0; x < stopPinkNoise.length; x++) {
+        stopPinkNoise[x].stop();
+      }
+    }    
     
     //**************EVALUATE SENSOR DATA AND PLAY SOUNDS ACCORDINGLY**************
     //determine color, update oldColor and newColor
     for (int x = 0; x < numberOfSensors; x++) {
-      oldColors[x] = newColors[x];               //oldColor is now equal to the previous value of newColor
+      oldColors[x] = newColors[x];                  //oldColor is now equal to the previous value of newColor
       if (irSensors[x] <= threshold[x]) {           //if sensor value below threshold, color is white
         newColors[x] = 1;
-      } //end(sensors[x] <= threshold)
-      else {                                     //otherwise, color is black
+      }
+      else {                                        //otherwise, color is black
         newColors[x] = 0;
-      } //end else
+      }
       print(newColors[x] + ", ");
-      //soundType = 2;
+
     } //end for
     
     //SoundType 1: Drum set
     if (soundType == 1) {
       for (int x = 0; x < numberOfSensors; x++) {
         if(newColors[x] - oldColors[x] == -1) {          //if we have gone from white to black, 
-          collection1[x].play();                          //play sound
+          collection1[x].play();                         //play sound
         } else if(oldColors[x] - newColors[x] == -1) {   //if we have gone from black to white,
-          collection1[x].stop();                          //stop sound  
+          collection1[x].stop();                         //stop sound  
         }
-      } //end for
+      }
     } //end if
     
     //SoundType 2: Triangle Oscillations
@@ -334,7 +384,7 @@ void draw() {
         } else if(oldColors[x] - newColors[x] == -1) {   //if we have gone from black to white,
           collection2[x].stop();                         //stop sound  
         }
-      } //end for
+      }
     } //end if
       
     //SoundType 3: Weird Noises
@@ -401,63 +451,63 @@ void draw() {
     } //end if
     
     if (soundType == 4) {
-      if(newColors[0] - oldColors[0] == -1) {          //if we have gone from white to black, 
+      if(newColors[0] - oldColors[0] == -1) {        //if we have gone from white to black, 
         mix0.play();                                 //play sound
-      } else if(oldColors[0] - newColors[0] == -1) {   //if we have gone from black to white,
+      } else if(oldColors[0] - newColors[0] == -1) { //if we have gone from black to white,
         mix0.stop();                                 //stop sound  
       }
       
-      if(newColors[1] - oldColors[1] == -1) {          //if we have gone from white to black, 
+      if(newColors[1] - oldColors[1] == -1) {        //if we have gone from white to black, 
         mix1.play();                                 //play sound
-      } else if(oldColors[1] - newColors[1] == -1) {   //if we have gone from black to white,
+      } else if(oldColors[1] - newColors[1] == -1) { //if we have gone from black to white,
         mix1.stop();                                 //stop sound  
       }
       
-      if(newColors[2] - oldColors[2] == -1) {          //if we have gone from white to black, 
+      if(newColors[2] - oldColors[2] == -1) {        //if we have gone from white to black, 
         mix2.play();                                 //play sound
-      } else if(oldColors[2] - newColors[2] == -1) {   //if we have gone from black to white,
+      } else if(oldColors[2] - newColors[2] == -1) { //if we have gone from black to white,
         mix2.stop();                                 //stop sound  
       }
       
-      if(newColors[3] - oldColors[3] == -1) {          //if we have gone from white to black, 
+      if(newColors[3] - oldColors[3] == -1) {        //if we have gone from white to black, 
         mix3.play();                                 //play sound
-      } else if(oldColors[3] - newColors[3] == -1) {   //if we have gone from black to white,
+      } else if(oldColors[3] - newColors[3] == -1) { //if we have gone from black to white,
         mix3.stop();                                 //stop sound  
       }
       
-      if(newColors[4] - oldColors[4] == -1) {          //if we have gone from white to black, 
+      if(newColors[4] - oldColors[4] == -1) {        //if we have gone from white to black, 
         mix4.play();                                 //play sound
-      } else if(oldColors[4] - newColors[4] == -1) {   //if we have gone from black to white,
+      } else if(oldColors[4] - newColors[4] == -1) { //if we have gone from black to white,
         mix4.stop();                                 //stop sound  
       }  
       
-      if(newColors[5] - oldColors[5] == -1) {          //if we have gone from white to black, 
+      if(newColors[5] - oldColors[5] == -1) {        //if we have gone from white to black, 
         mix5.play();                                 //play sound
-      } else if(oldColors[5] - newColors[5] == -1) {   //if we have gone from black to white,
+      } else if(oldColors[5] - newColors[5] == -1) { //if we have gone from black to white,
         mix5.stop();                                 //stop sound  
       }
       
-      if(newColors[6] - oldColors[6] == -1) {          //if we have gone from white to black, 
+      if(newColors[6] - oldColors[6] == -1) {        //if we have gone from white to black, 
         mix6.play();                                 //play sound
-      } else if(oldColors[6] - newColors[6] == -1) {   //if we have gone from black to white,
+      } else if(oldColors[6] - newColors[6] == -1) { //if we have gone from black to white,
         mix6.stop();                                 //stop sound  
       }
       
-      if(newColors[7] - oldColors[7] == -1) {          //if we have gone from white to black, 
-      //  mix7.play();                                 //play sound
-      } else if(oldColors[7] - newColors[7] == -1) {   //if we have gone from black to white,
-      //  mix7.stop();                                 //stop sound  
+      if(newColors[7] - oldColors[7] == -1) {        //if we have gone from white to black, 
+      //  mix7.play();                               //play sound
+      } else if(oldColors[7] - newColors[7] == -1) { //if we have gone from black to white,
+      //  mix7.stop();                               //stop sound  
       }
       
-      if(newColors[8] - oldColors[8] == -1) {          //if we have gone from white to black, 
-        mix8.play();                                 //play sound
-      } else if(oldColors[8] - newColors[8] == -1) {   //if we have gone from black to white,
+      if(newColors[8] - oldColors[8] == -1) {        //if we have gone from white to black, 
+        //mix8.play();                                 //play sound
+      } else if(oldColors[8] - newColors[8] == -1) { //if we have gone from black to white,
         mix8.stop();                                 //stop sound  
       }
       
-      if(newColors[9] - oldColors[9] == -1) {          //if we have gone from white to black, 
+      if(newColors[9] - oldColors[9] == -1) {        //if we have gone from white to black, 
         mix9.play();                                 //play sound
-      } else if(oldColors[9] - newColors[9] == -1) {   //if we have gone from black to white,
+      } else if(oldColors[9] - newColors[9] == -1) { //if we have gone from black to white,
         mix9.stop();                                 //stop sound  
       }
     } //end if
@@ -469,17 +519,17 @@ void draw() {
         } else if(oldColors[x] - newColors[x] == -1) {   //if we have gone from black to white,
           collection5[x].stop();                         //stop sound  
         }
-      } //end for
+      }
     } //end if
     
     if (soundType == 6) {
       for (int x = 0; x < numberOfSensors; x++) {
         if(newColors[x] - oldColors[x] == -1) {          //if we have gone from white to black, 
-          collection6[x].play();                          //play sound
+          collection6[x].play();                         //play sound
         } else if(oldColors[x] - newColors[x] == -1) {   //if we have gone from black to white,
-          collection6[x].stop();                          //stop sound  
+          collection6[x].stop();                         //stop sound  
         }
-      } //end for
+      }
     } //end if
 
   }//end if(serial != null)
