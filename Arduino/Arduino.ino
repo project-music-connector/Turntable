@@ -8,7 +8,12 @@ modified September 2016
 by Alice Barbe & Beatriz Fusaro
 */
 #include <math.h>
+#include <AccelStepper.h>
 
+#define motorPin1  3     // IN1 on the ULN2003 driver 1
+#define motorPin2  4     // IN2 on the ULN2003 driver 1
+#define motorPin3  5     // IN3 on the ULN2003 driver 1
+#define motorPin4  6     // IN4 on the ULN2003 driver 1
 //Infrared Sensor Pins
 const int irPin0 = A0;
 const int irPin1 = A1;
@@ -59,14 +64,17 @@ int RunningAverage(int newer, int value, int pv[5]) {
 void setup() {
   // initialize serial communications at 9600 bps:
   Serial.begin(9600);
+
+  // Initialize with pin sequence IN1-IN3-IN2-IN4 for using the AccelStepper with 28BYJ-48
+  AccelStepper stepper1(HALFSTEP, motorPin1, motorPin3, motorPin2, motorPin4);
   
   //make switch pins inputs
-  pinMode(switch1, INPUT);
-  pinMode(switch2, INPUT);
-  pinMode(switch3, INPUT);
-  pinMode(switch4, INPUT);
-  pinMode(switch5, INPUT);
-  pinMode(switch6, INPUT);
+  pinMode(switch1, INPUT_PULLDOWN);
+  pinMode(switch2, INPUT_PULLDOWN);
+  pinMode(switch3, INPUT_PULLDOWN);
+  pinMode(switch4, INPUT_PULLDOWN);
+  pinMode(switch5, INPUT_PULLDOWN);
+  pinMode(switch6, INPUT_PULLDOWN);
   //make motor pin output
   pinMode(motorPin, OUTPUT);
   
@@ -135,31 +143,35 @@ void loop() {
   Serial.print(",");
   
   // print switch results to serial
-  if (digitalPin1 == HIGH) {
+  if (digitalPin1 == LOW) {
     Serial.print(1, DEC);
   }
-  else if (digitalPin2 == HIGH) {
+  else if (digitalPin2 == LOW) {
     Serial.print(2, DEC);
   }
-  else if (digitalPin3 == HIGH) {
+  else if (digitalPin3 == LOW) {
     Serial.print(3, DEC);
   }
-  else if (digitalPin4 == HIGH) {
+  else if (digitalPin4 == LOW) {
     Serial.print(4, DEC);
   }
-  else if (digitalPin5 == HIGH) {
+  else if (digitalPin5 == LOW) {
     Serial.print(5, DEC);
   }
-  else if (digitalPin6 == HIGH) {
+  else if (digitalPin6 == LOW) {
     Serial.print(6, DEC);
   }
   Serial.print(",");
 
   // read potentiometer value: between 0 and 1023
   int potValue = analogRead(potPin);
+  stepper1.setSpeed(potValue / 4);
   
   // output voltage between 0 and 255 to control motor speed
-  analogWrite(motorPin, potValue / 4);
+  if (stepper1.distanceToGo() == 0) {
+    stepper1.moveTo(stepper1.currentPosition()+100);
+  }
+  stepper1.run();
   //Serial.print("    ");
   //Serial.print(potValue / 4, DEC);
   
