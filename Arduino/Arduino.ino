@@ -1,18 +1,6 @@
 //by Alice Barbe and Beatriz Fusaro
 
 #include <math.h>
-#include <AccelStepper.h>
-#define HALFSTEP  8
-
-
-// Motor pin definitions
-#define motorPin1 50     // IN1 on the ULN2003 driver 1
-#define motorPin2 51     // IN2 on the ULN2003 driver 1
-#define motorPin3 52     // IN3 on the ULN2003 driver 1
-#define motorPin4 53     // IN4 on the ULN2003 driver 1
-
-// Initialize with pin sequence IN1-IN3-IN2-IN4 for using the AccelStepper with 28BYJ-48
-AccelStepper stepper(HALFSTEP, motorPin1, motorPin3, motorPin2, motorPin4);
   
 //Infrared Sensor Pins
 const int irPin0  = A0;
@@ -91,10 +79,6 @@ void setup() {
   pinMode(switch10, INPUT_PULLUP);
   pinMode(switch11, INPUT_PULLUP);
   pinMode(switch12, INPUT_PULLUP);
-
-  //set initial motor values
-  stepper.setMaxSpeed(1000);
-  stepper.setSpeed(50);  
 }
 
 void loop() {
@@ -203,20 +187,11 @@ void loop() {
   }
   
   Serial.print(",");
-
-  
-  int potValue = analogRead(potPin);
-  
-  Serial.print(potValue);
   Serial.println();
-
-  // read potentiometer value: between 0 and 1023
-  stepper.setSpeed(potValue);
-  stepper.runSpeed();
 
   // wait 50 milliseconds before the next loop
   // for the analog-to-digital converter to settle
   // after the last reading, and to allow Processing
   // to process the information:
-  //delay(50);
+  delay(50);
 }

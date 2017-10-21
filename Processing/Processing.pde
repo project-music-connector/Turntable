@@ -340,7 +340,7 @@ void setup() {
   collection6[14] = guitar14;
   
   //Add generated sounds to stop arrays
-  for (int x = 0; x < 10; x++) {
+  for (int x = 0; x < numberOfSensors; x++) {
     stopTriOsc[x] = collection2[x];
   }
   
@@ -360,7 +360,7 @@ void setup() {
   stopSinOsc[13] = mix7;
   stopSinOsc[14] = mix8;
   stopSinOsc[15] = mix9;
-  stopSinOsc[11] = mix10;
+  stopSinOsc[16] = mix10;
   
   stopSqrOsc[0] = weird0;
   stopSqrOsc[1] = weird13;
