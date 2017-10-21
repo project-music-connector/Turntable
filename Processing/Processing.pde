@@ -143,7 +143,11 @@ int[] oldColors = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 int soundType;
 int oldSoundType = 0;
 //Threshold for black vs white
-int[] threshold = {600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600};
+/*int[] threshold = new int[numberOfSensors];
+for (int x = 0; x < numberOfSensors; x++) {
+  threshold[x] = 400;
+}*/
+int[] threshold = {400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400};
 //int[] threshold = {80, 80, 80, 80, 80, 80, 80, 80, 80, 80};
 //Array for holding serial input in integers
 int[] serialInputInt;
