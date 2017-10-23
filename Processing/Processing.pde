@@ -145,9 +145,9 @@ int oldSoundType = 0;
 //Threshold for black vs white
 /*int[] threshold = new int[numberOfSensors];
 for (int x = 0; x < numberOfSensors; x++) {
-  threshold[x] = 400;
+  threshold[x] = 400; 
 }*/
-int[] threshold = {400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400};
+int[] threshold = {900, 700, 700, 700, 700, 300, 300, 300, 300, 300, 300, 300, 200, 300, 100};
 //int[] threshold = {80, 80, 80, 80, 80, 80, 80, 80, 80, 80};
 //Array for holding serial input in integers
 int[] serialInputInt;
@@ -659,15 +659,15 @@ void draw() {
       }
       
       if(newColors[12] - oldColors[12] == -1) {        //if we have gone from white to black, 
-        mix12.play();                                 //play sound
+        //mix12.play();                                 //play sound
       } else if(oldColors[12] - newColors[12] == -1) { //if we have gone from black to white,
-        mix12.stop();                                 //stop sound  
+        //mix12.stop();                                 //stop sound  
       }
       
       if(newColors[13] - oldColors[13] == -1) {        //if we have gone from white to black, 
-        mix13.play();                                 //play sound
+        //mix13.play();                                 //play sound
       } else if(oldColors[13] - newColors[13] == -1) { //if we have gone from black to white,
-        mix13.stop();                                 //stop sound  
+        //mix13.stop();                                 //stop sound  
       }
       
       if(newColors[14] - oldColors[14] == -1) {        //if we have gone from white to black, 
